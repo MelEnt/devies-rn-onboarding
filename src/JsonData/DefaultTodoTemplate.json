@@ -1,0 +1,42 @@
+[
+    {
+        "title": "Skriva avtal",
+        "deadline": "",
+        "done": false
+    },
+    {
+        "title": "Beställ utrustning",
+        "deadline": "",
+        "done": false
+    },
+    {
+        "title": "Lägg in i PE",
+        "deadline": "",
+        "done": false
+    },
+    {
+        "title": "Lägg in i SEB",
+        "deadline": "",
+        "done": false
+    },
+    {
+        "title": "Systembehörighet",
+        "deadline": "",
+        "done": false
+    },
+    {
+        "title": "Skicka info",
+        "deadline": "",
+        "done": false
+    },
+    {
+        "title": "Skapa CV",
+        "deadline": "",
+        "done": false
+    },
+    {
+        "title": "Reminder om första dagen",
+        "deadline": "",
+        "done": false
+    }
+]

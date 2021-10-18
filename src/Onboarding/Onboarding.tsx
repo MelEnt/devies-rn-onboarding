@@ -13,7 +13,7 @@ interface OnboardingScreenProps {
 export function Onboarding({ route, navigation }: DrawerStackNavProps<"Onboarding">) {
 
 
-    console.log(route, navigation)
+    // console.log(route, navigation)
     if (!route.params) {
         return <Center>
             <Text>
@@ -39,10 +39,12 @@ export function Onboarding({ route, navigation }: DrawerStackNavProps<"Onboardin
     }
 
     function handleDoubleTap(todoId: string) {
-        navigation.navigate("EditTodoModal", {
-            todoId: todoId,
-            userId: userId
-        })
+        /*         navigation.navigate("EditTodoModal", {
+                    todoId: todoId,
+                    userId: userId
+                }) */
+
+        // Temp. disable
     }
 
     return (

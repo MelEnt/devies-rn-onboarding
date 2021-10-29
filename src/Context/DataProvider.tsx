@@ -1,9 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useState } from 'react';
 import uuid from 'react-native-uuid';
-import DefaultTodoTemplate from "../JsonData/DefaultTodoTemplate.json";
-import DataStructure from "../JsonData/DataStructure.json";
-import { IToDoItem } from '../Components/ToDoItem';
+import DefaultTodoTemplate from "../Data/DefaultTodoTemplate.json";
 
 
 const DATA_KEY = "employees";
@@ -15,9 +13,18 @@ interface DataProviderProps {
 interface DataContextProps {
     employees: Employee[],
     addEmployee: (name: string) => Promise<Employee>,
-    updateTodo: (userId: string, todoId: string, isChecked: boolean) => Promise<void>,
+    /**
+     * 
+     */
+    updateTodo: (userId: string, todoId: string, newTodoItem: ToDoItemProps) => Promise<void>,
     loadData: () => Promise<void>,
-    getTodos: (userId: string) => ToDoItemProps[]
+    /**
+     * Returns list of Todos based on userId
+     * @param userId
+     * @returns
+     */
+    getTodosByUserId: (userId: string) => ToDoItemProps[],
+    getTodoById: (userId: string, todoId: string) => ToDoItemProps
 }
 
 export type ToDoItemProps = {
@@ -25,7 +32,8 @@ export type ToDoItemProps = {
     title: string,
     deadline: string,
     done: boolean,
-    description: string
+    description: string,
+    hasNotification: boolean
 };
 
 export type Employee = {
@@ -42,7 +50,14 @@ function handleAddEmployee(name: string) {
     const newEmployee: Employee = {
         id: employeeId,
         name,
-        todos: DefaultTodoTemplate.map(i => ({ ...i, id: uuid.v4().toString(), description: "lorem".repeat(20) }))
+        todos: DefaultTodoTemplate.map(i =>
+        ({
+            ...i,
+            hasNotification: false,
+            id: uuid.v4().toString(),
+            description: "lorem".repeat(20),
+            deadline: new Date().toJSON()
+        }))
     }
 
     console.log("created new", newEmployee);
@@ -54,7 +69,7 @@ async function handlePersistData(newData: Employee[]) {
     try {
         await AsyncStorage.setItem(DATA_KEY, data);
     } catch (e) {
-        console.error("ERRAH", e);
+        console.error("ERRAH persist", e);
     }
 }
 
@@ -63,13 +78,23 @@ async function handleLoadData() {
         const data = await AsyncStorage.getItem(DATA_KEY);
         return data ? JSON.parse(data) : [];
     } catch (e) {
-        console.error("ERRAH", e);
+        console.error("ERRAH load", e);
         return [];
     }
 }
 
 export function DataProvider({ children }: DataProviderProps) {
     const [employees, setEmployees] = useState<Employee[]>([]);
+
+    function getTodosByUserId(userId: string) {
+        return employees.filter(i => i.id === userId)[0].todos;
+    }
+
+    function getTodoById(userId: string, todoId: string) {
+        const userTodos = getTodosByUserId(userId);
+        return userTodos.filter(i => i.id === todoId)[0];
+    }
+
     return (
         <DataContext.Provider value={{
             employees,
@@ -84,16 +109,32 @@ export function DataProvider({ children }: DataProviderProps) {
                 const loadedData = await handleLoadData();
                 setEmployees(loadedData);
             },
-            updateTodo: async (userId, todoId, isChecked) => {
-                const todos = employees.filter(i => i.id === userId)[0].todos;
-                const todo = todos.filter(i => i.id === todoId)[0];
-                todo.done = isChecked;
+            /**
+             * Update todoItem based on userId
+             * @param userId 
+             * @param todoId 
+             * @param newTodoItem 
+             */
+            updateTodo: async (userId, todoId, newTodoItem) => {
+                const todos = getTodosByUserId(userId);
+                let todo = todos.filter(i => i.id === todoId)[0];
+                // todo.done = isChecked;
+                todo = { ...todo, ...newTodoItem };
                 await handlePersistData(employees);
                 // might need to reassign new todo/todos to override existing todo/todos to persist value
             },
-            getTodos: (userId) => {
-                return employees.filter(i => i.id === userId)[0].todos;
-            }
+            /**
+             * Returns list of Todos based on userId
+             * @param userId
+             * @returns
+             */
+            getTodosByUserId,
+            /**
+             * Returns list of Todos based on todoId
+             * @param todoId
+             * @returns
+             */
+            getTodoById,
         }}>
             {children}
         </DataContext.Provider>

@@ -23,9 +23,9 @@ export function Onboarding({ route, navigation }: DrawerStackNavProps<"Onboardin
     }
 
 
-    const { getTodos, updateTodo } = useContext(DataContext);
+    const { getTodoById, getTodosByUserId, updateTodo } = useContext(DataContext);
     const { userId, name } = route.params;
-    const todos = getTodos(userId);
+    const todos = getTodosByUserId(userId);
 
     useEffect(() => {
         navigation.setOptions({
@@ -35,16 +35,17 @@ export function Onboarding({ route, navigation }: DrawerStackNavProps<"Onboardin
 
 
     function handleOnCheck(todoId: string, isChecked: boolean) {
-        updateTodo(userId!, todoId, isChecked);
+        const todo = getTodoById(userId, todoId);
+        todo.done = isChecked;
+        updateTodo(userId, todoId, todo);
     }
 
     function handleDoubleTap(todoId: string) {
-        /*         navigation.navigate("EditTodoModal", {
-                    todoId: todoId,
-                    userId: userId
-                }) */
+        navigation.navigate("EditTodoModal", {
+            todoId: todoId,
+            userId: userId
+        })
 
-        // Temp. disable
     }
 
     return (

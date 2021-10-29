@@ -1,30 +1,32 @@
 import React, { useEffect, useState } from 'react'
-import { Keyboard, Platform, Pressable, View, StyleSheet } from 'react-native';
+import { Keyboard, Platform, View, StyleSheet } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { createIconSetFromFontello } from '@expo/vector-icons';
 import { Button, Modal, Portal, Text } from 'react-native-paper';
+import DeadlineDisplay from './DeadlineDisplay';
 
 
 interface DatePickerProps {
-    display: (date: string) => JSX.Element,
     value: string,
-    onChange: (date: string) => void,
-    label: string
+    onChange: (date: Date) => void,
+    label: string,
+    hasNotification: boolean
 }
 
-export function DatePicker({ label = "label", display, value, onChange }: DatePickerProps) {
+
+
+export function DatePicker({ label = "label", value, onChange, hasNotification }: DatePickerProps) {
     const [showDate, setShowDate] = useState<boolean>(false);
     const [showTime, setShowTime] = useState<boolean>(false);
-    const [tempDate, setTempDate] = useState(new Date());
-    const [tempTime, setTempTime] = useState(new Date());
+    const [tempDate, setTempDate] = useState<Date>(new Date(value));
 
-    const [newDate, setNewDate] = useState<string>(value);
+
+
+    const [newDate, setNewDate] = useState<Date>(new Date(value));
 
     const isAndroid = Platform.OS === "android";
 
-    console.log("value", value);
     function handleSetDate(e: any, date?: Date) {
-        console.log("onchange", date, tempDate, showDate);
+        // console.log("onchange", date, tempDate, showDate);
         if (date) {
             setTempDate(date);
         };
@@ -32,18 +34,24 @@ export function DatePicker({ label = "label", display, value, onChange }: DatePi
         if (isAndroid) {
             if (date) {
                 setShowTime(true);
+                setShowDate(false);
             }
+
             setShowDate(false);
-            // setNewDate(date);
         }
+
     }
 
     function handleSetTime(e: any, date?: Date) {
         if (date) {
-            setTempTime(date);
-            console.log("TIME", date.getMinutes(), date.getHours());
+            const outputDate = new Date(date);
+            outputDate.setSeconds(0);
+            setTempDate(date);
+            console.log("OuTPUTDATE", outputDate, date);
         }
+
         setShowTime(false);
+        setShowDate(false);
     }
 
     function handleShowDatePicker() {
@@ -53,28 +61,37 @@ export function DatePicker({ label = "label", display, value, onChange }: DatePi
 
     function handleCloseDatePicker() {
         setShowDate(false);
+        setTempDate(new Date(value));
     }
 
     function handleConfirmDate() {
+        setNewDate(tempDate);
+        handleCloseDatePicker();
+    }
+
+    function handleSetNotification() {
 
     }
 
-    return (
-        <View style={{ backgroundColor: "grey" }}>
-            <Pressable onPress={handleShowDatePicker}>
-                {display(value)}
-                <Pressable>
+    console.log(showDate, showTime);
 
-                </Pressable>
-            </Pressable>
+    return (
+        <View>
+            <View>
+                <DeadlineDisplay
+                    date={tempDate}
+                    onPressDate={handleShowDatePicker}
+                    hasNotification={hasNotification}
+                    onSetNotification={handleSetNotification} />
+            </View>
             {/* {isAndroid ? } */}
             {isAndroid ?
-                <>
+                <View>
                     {showDate && <DateTimePicker value={tempDate} mode={"date"}
                         display={"default"} onChange={handleSetDate} />}
-                    {showTime && <DateTimePicker value={tempTime} mode={"time"}
+                    {showTime && <DateTimePicker value={tempDate} mode={"time"}
                         display={"default"} onChange={handleSetTime} />}
-                </>
+                </View>
                 :
                 <Portal>
                     <Modal dismissable onDismiss={handleCloseDatePicker}
@@ -98,7 +115,6 @@ export function DatePicker({ label = "label", display, value, onChange }: DatePi
                         </View>
                     </Modal>
                 </Portal>}
-
         </View>
     );
 }

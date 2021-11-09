@@ -1,14 +1,13 @@
-import { createDrawerNavigator, DrawerContentComponentProps, DrawerContentScrollView, DrawerItem, DrawerItemList, DrawerScreenProps } from '@react-navigation/drawer';
-import { ParamListBase } from '@react-navigation/routers';
+import { createDrawerNavigator, DrawerContentComponentProps, DrawerItem } from '@react-navigation/drawer';
 import React, { useContext } from 'react'
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { DataContext, Employee } from '../Context/DataProvider';
 import { Onboarding } from '../Onboarding/Onboarding';
-import { IToDoItem } from '../Components/ToDoItem';
 import { DrawerParamList } from './DrawerParamList';
 import { DrawerListHeader } from './DrawerListHeader';
 import { DrawerListFooter } from './DrawerListFooter';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface DrawerRootProps {
 }
@@ -17,33 +16,41 @@ function DrawerList(props: DrawerContentComponentProps) {
     /*     const items = Array.from(Array(10), (_, i) =>
             <DrawerItem key={i} label={`Test ${i + 1}`} onPress={() => alert("abolän")} />) */
 
-    const { employees } = useContext(DataContext);
+    const { employees, selectedEmployeeId } = useContext(DataContext);
 
 
     return (
-        <View style={{ flex: 1, padding: 10 }}>
-            <DrawerContentScrollView {...props}>
-                <DrawerListHeader />
+        <SafeAreaView style={{ flex: 1, padding: 10 }}>
+            <View>
                 <FlatList
-                    renderItem={({ item }: { item: Employee }) => {
+                    {...props}
+                    horizontal={false}
+                    ListHeaderComponent={
+                        <DrawerListHeader />}
+                    ListFooterComponent={<DrawerListFooter onShowAdd={() => props.navigation.navigate("AddNewEmployeeModal")} />}
+                    renderItem={({ item: employee }: { item: Employee }) => {
                         return (
                             <DrawerItem
-                                key={item.id}
-                                label={item.name}
+                                activeTintColor='#2196f3'
+                                activeBackgroundColor='rgba(0, 0, 0, .04)'
+                                inactiveTintColor='rgba(0, 0, 0, .87)'
+                                inactiveBackgroundColor='transparent'
+                                focused={selectedEmployeeId === employee.id}
+                                key={employee.id}
+                                label={employee.name}
                                 onPress={() => {
                                     props.navigation.navigate("Onboarding", {
-                                        userId: item.id,
-                                        name: item.name
+                                        userId: employee.id,
+                                        name: employee.name
                                     })
                                 }} />)
                     }}
                     keyExtractor={(item) => item.id}
                     data={employees} />
-                <DrawerListFooter onShowAdd={() => props.navigation.navigate("AddNewEmployeeModal")} />
-            </DrawerContentScrollView>
-        </View>)
+            </View>
+        </SafeAreaView>
+    )
 }
-
 
 const Drawer = createDrawerNavigator<DrawerParamList>();
 

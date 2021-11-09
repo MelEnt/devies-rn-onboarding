@@ -24,7 +24,9 @@ interface DataContextProps {
      * @returns
      */
     getTodosByUserId: (userId: string) => ToDoItemProps[],
-    getTodoById: (userId: string, todoId: string) => ToDoItemProps
+    getTodoById: (userId: string, todoId: string) => ToDoItemProps,
+    selectedEmployeeId: string,
+    setSelectedEmployeeId: React.Dispatch<React.SetStateAction<string>>
 }
 
 export type ToDoItemProps = {
@@ -85,6 +87,7 @@ async function handleLoadData() {
 
 export function DataProvider({ children }: DataProviderProps) {
     const [employees, setEmployees] = useState<Employee[]>([]);
+    const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>("");
 
     function getTodosByUserId(userId: string) {
         return employees.filter(i => i.id === userId)[0].todos;
@@ -135,6 +138,8 @@ export function DataProvider({ children }: DataProviderProps) {
              * @returns
              */
             getTodoById,
+            setSelectedEmployeeId,
+            selectedEmployeeId
         }}>
             {children}
         </DataContext.Provider>

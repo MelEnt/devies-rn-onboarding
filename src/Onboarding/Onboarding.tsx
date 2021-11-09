@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from 'react'
 import { Text, View } from 'react-native';
-import { FlatList, ScrollView } from 'react-native-gesture-handler';
+import { FlatList } from 'react-native-gesture-handler';
 import { Center } from '../Components/Center';
 import { IToDoItem, ToDoItem } from '../Components/ToDoItem';
 import { DataContext } from '../Context/DataProvider';
@@ -23,11 +23,12 @@ export function Onboarding({ route, navigation }: DrawerStackNavProps<"Onboardin
     }
 
 
-    const { getTodoById, getTodosByUserId, updateTodo } = useContext(DataContext);
+    const { getTodoById, getTodosByUserId, updateTodo, setSelectedEmployeeId } = useContext(DataContext);
     const { userId, name } = route.params;
     const todos = getTodosByUserId(userId);
 
     useEffect(() => {
+        setSelectedEmployeeId(userId);
         navigation.setOptions({
             title: `Onboarding - ${name}`
         })
@@ -49,14 +50,14 @@ export function Onboarding({ route, navigation }: DrawerStackNavProps<"Onboardin
     }
 
     return (
-        <ScrollView>
-
+        <View>
             <FlatList
                 renderItem={({ item }: { item: IToDoItem }) => {
                     return <ToDoItem {...item} onCheck={handleOnCheck} onDoubleTap={handleDoubleTap} />
                 }}
                 keyExtractor={(item: IToDoItem) => item.id}
                 data={todos} />
-        </ScrollView>
+        </View>
+
     );
 }

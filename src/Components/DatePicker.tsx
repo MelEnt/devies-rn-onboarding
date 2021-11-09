@@ -18,44 +18,43 @@ export function DatePicker({ label = "label", value, onChange, hasNotification }
     const [showDate, setShowDate] = useState<boolean>(false);
     const [showTime, setShowTime] = useState<boolean>(false);
     const [tempDate, setTempDate] = useState<Date>(new Date(value));
-
+    const isAndroid = Platform.OS === "android";
 
 
     const [newDate, setNewDate] = useState<Date>(new Date(value));
 
-    const isAndroid = Platform.OS === "android";
 
     function handleSetDate(e: any, date?: Date) {
         // console.log("onchange", date, tempDate, showDate);
+        if (isAndroid) {
+            setShowDate(false);
+        }
+
         if (date) {
             setTempDate(date);
         };
 
-        if (isAndroid) {
-            if (date) {
-                setShowTime(true);
-                setShowDate(false);
-            }
-
-            setShowDate(false);
-        }
-
     }
 
     function handleSetTime(e: any, date?: Date) {
+        setShowTime(false);
         if (date) {
             const outputDate = new Date(date);
             outputDate.setSeconds(0);
             setTempDate(date);
             console.log("OuTPUTDATE", outputDate, date);
         }
-
-        setShowTime(false);
-        setShowDate(false);
     }
 
     function handleShowDatePicker() {
+        setShowTime(false);
         setShowDate(true);
+        Keyboard.dismiss();
+    }
+
+    function handleShowTimePicker() {
+        setShowDate(false);
+        setShowTime(true);
         Keyboard.dismiss();
     }
 
@@ -65,15 +64,15 @@ export function DatePicker({ label = "label", value, onChange, hasNotification }
     }
 
     function handleConfirmDate() {
-        setNewDate(tempDate);
-        handleCloseDatePicker();
+        setShowDate(false);
+        setTempDate(tempDate);
     }
 
     function handleSetNotification() {
 
     }
 
-    console.log(showDate, showTime);
+    console.log(showDate, showTime, tempDate, new Date(value));
 
     return (
         <View>
@@ -81,34 +80,35 @@ export function DatePicker({ label = "label", value, onChange, hasNotification }
                 <DeadlineDisplay
                     date={tempDate}
                     onPressDate={handleShowDatePicker}
+                    onPressTime={handleShowTimePicker}
                     hasNotification={hasNotification}
                     onSetNotification={handleSetNotification} />
             </View>
             {/* {isAndroid ? } */}
-            {isAndroid ?
+            {isAndroid &&
                 <View>
                     {showDate && <DateTimePicker value={tempDate} mode={"date"}
                         display={"default"} onChange={handleSetDate} />}
                     {showTime && <DateTimePicker value={tempDate} mode={"time"}
                         display={"default"} onChange={handleSetTime} />}
-                </View>
-                :
+                </View>}
+            {!isAndroid &&
                 <Portal>
-                    <Modal dismissable onDismiss={handleCloseDatePicker}
+                    <Modal dismissable onDismiss={() => setShowDate(false)}
                         visible={showDate} contentContainerStyle={styles.modalContainerStyle}>
-                        <View style={{ flex: 1 }}>
+                        <View>
                             <View style={{ alignItems: "center" }}>
                                 <Text style={{ fontSize: 24, padding: 10 }}>
                                     {label}
                                 </Text>
                             </View>
-                            {showDate && <DateTimePicker value={tempDate} mode={"datetime"}
-                                display={"spinner"} onChange={handleSetDate} />}
-                            <View style={{ flex: 1 }}>
-                                <View style={{ flex: 1 }}>
+                            <DateTimePicker value={tempDate} mode={"datetime"}
+                                display={"spinner"} onChange={handleSetDate} />
+                            <View>
+                                <View>
                                     <Button color={"blue"} onPress={handleConfirmDate} >{"Bekräfta"}</Button>
                                 </View>
-                                <View style={{ flex: 1, marginTop: 20 }}>
+                                <View>
                                     <Button color={"red"} onPress={handleCloseDatePicker} >{"Avbryt"}</Button>
                                 </View>
                             </View>
@@ -123,7 +123,6 @@ export function DatePicker({ label = "label", value, onChange, hasNotification }
 const styles = StyleSheet.create({
     modalContainerStyle: {
         backgroundColor: "white",
-        flex: .5,
         margin: 15,
         padding: 15,
         borderRadius: 10

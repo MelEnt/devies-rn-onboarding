@@ -7,6 +7,7 @@ import { SWE_MONTHS } from "../Data/Constants";
 interface DeadlineDisplay {
     date: Date,
     onPressDate: () => void,
+    onPressTime: () => void,
     hasNotification: boolean,
     onSetNotification: () => void
 }
@@ -22,17 +23,17 @@ function addZero(i: number | string) {
 }
 
 function DeadlineDisplay(props: DeadlineDisplay) {
-    const { date, onPressDate, hasNotification, onSetNotification } = props;
+    const { date, onPressDate, onPressTime, hasNotification, onSetNotification } = props;
     // const formattedDate = new Date(date).;
     const isAndroid = Platform.OS === "android";
 
     let stringDate, stringTime;
 
     if (isAndroid) {
-        stringDate = date.getDate() + ":e " + SWE_MONTHS[date.getMonth()] + " '" + date.getFullYear().toString().substring(2);
+        stringDate = date.getDate() + ". " + SWE_MONTHS[date.getMonth()] + " '" + date.getFullYear().toString().substring(2);
         stringTime = addZero(date.getHours()) + ":" + addZero(date.getMinutes());
     } else {
-        stringDate = date.toLocaleDateString(LOCALE, { day: "2-digit" }) + ":e "
+        stringDate = date.toLocaleDateString(LOCALE, { day: "numeric" }) + ". "
             + date.toLocaleString(LOCALE, { month: "short" }) +
             " '" + date.getFullYear().toString().substring(2);
         stringTime = date.toLocaleString(LOCALE, { hour: "numeric" }) +
@@ -45,12 +46,21 @@ function DeadlineDisplay(props: DeadlineDisplay) {
                     <MaterialIcons name="notifications-on" size={25} color="black" /> :
                     <MaterialIcons name="notifications-off" size={25} color="black" />}
             </Pressable>
-            <Pressable onPress={onPressDate}
-                style={{ flex: 4, marginLeft: 10, backgroundColor: "lightblue", justifyContent: "center", alignItems: "center", borderRadius: 10 }}>
-                <Text style={deadlineStyles.dateText}>
-                    {date ? stringDate + " • " + stringTime : "Sätt datum"}
+            <View style={{ marginLeft: 10, flex: 4, flexDirection: "row", backgroundColor: "lightblue", justifyContent: "center", alignItems: "center", borderRadius: 10 }}>
+                <Pressable onPress={onPressDate}>
+                    <Text style={deadlineStyles.dateText}>
+                        {date ? stringDate : "Sätt datum"}
+                    </Text>
+                </Pressable>
+                <Text style={{ marginLeft: 10, marginRight: 10 }}>
+                    {"•"}
                 </Text>
-            </Pressable>
+                <Pressable onPress={onPressTime}>
+                    <Text style={deadlineStyles.dateText}>
+                        {date ? stringTime : "Sätt tid"}
+                    </Text>
+                </Pressable>
+            </View>
         </View>
     )
 }

@@ -18,6 +18,7 @@ export function DatePicker({ label = "label", value, onChange, hasNotification }
     const [showDate, setShowDate] = useState<boolean>(false);
     const [showTime, setShowTime] = useState<boolean>(false);
     const [tempDate, setTempDate] = useState<Date>(new Date(value));
+    const [confirmedDate, setConfirmedDate] = useState<Date>(new Date(value));
     const isAndroid = Platform.OS === "android";
 
 
@@ -53,19 +54,19 @@ export function DatePicker({ label = "label", value, onChange, hasNotification }
     }
 
     function handleShowTimePicker() {
-        setShowDate(false);
         setShowTime(true);
+        setShowDate(false);
         Keyboard.dismiss();
     }
 
     function handleCloseDatePicker() {
         setShowDate(false);
-        setTempDate(new Date(value));
+        setTempDate(confirmedDate);
     }
 
     function handleConfirmDate() {
         setShowDate(false);
-        setTempDate(tempDate);
+        setConfirmedDate(tempDate);
     }
 
     function handleSetNotification() {
@@ -78,9 +79,9 @@ export function DatePicker({ label = "label", value, onChange, hasNotification }
         <View>
             <View>
                 <DeadlineDisplay
-                    date={tempDate}
+                    date={isAndroid ? tempDate : confirmedDate}
                     onPressDate={handleShowDatePicker}
-                    onPressTime={handleShowTimePicker}
+                    onPressTime={isAndroid ? handleShowTimePicker : handleShowDatePicker}
                     hasNotification={hasNotification}
                     onSetNotification={handleSetNotification} />
             </View>

@@ -2,14 +2,14 @@ import { MaterialIcons } from "@expo/vector-icons";
 import React from "react";
 import { Platform, Pressable, View, StyleSheet } from "react-native";
 import { Text } from "react-native-paper";
-import { SWE_MONTHS } from "../Data/Constants";
+import { SE_MONTHS } from "../Data/Constants";
 
 interface DeadlineDisplay {
     date: Date,
     onPressDate: () => void,
     onPressTime: () => void,
     hasNotification: boolean,
-    onSetNotification: () => void
+    onSetNotification: (hasNotification: boolean) => void
 }
 
 const LOCALE = "sv-SE";
@@ -30,7 +30,7 @@ function DeadlineDisplay(props: DeadlineDisplay) {
     let stringDate, stringTime;
 
     if (isAndroid) {
-        stringDate = date.getDate() + ". " + SWE_MONTHS[date.getMonth()] + " '" + date.getFullYear().toString().substring(2);
+        stringDate = date.getDate() + ". " + SE_MONTHS[date.getMonth()] + " '" + date.getFullYear().toString().substring(2);
         stringTime = addZero(date.getHours()) + ":" + addZero(date.getMinutes());
     } else {
         stringDate = date.toLocaleDateString(LOCALE, { day: "numeric" }) + ". "
@@ -41,7 +41,7 @@ function DeadlineDisplay(props: DeadlineDisplay) {
     }
     return (
         <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
-            <Pressable onPress={() => console.log("ABOW")} style={{ flex: 1, backgroundColor: "orange", alignItems: "center", borderRadius: 10, padding: 5 }}>
+            <Pressable onPress={() => onSetNotification(!hasNotification)} style={{ flex: 1, backgroundColor: "orange", alignItems: "center", borderRadius: 10, padding: 5 }}>
                 {hasNotification ?
                     <MaterialIcons name="notifications-on" size={25} color="black" /> :
                     <MaterialIcons name="notifications-off" size={25} color="black" />}

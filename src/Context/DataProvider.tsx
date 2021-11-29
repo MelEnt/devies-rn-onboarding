@@ -29,18 +29,20 @@ interface DataContextProps {
     setSelectedEmployeeId: React.Dispatch<React.SetStateAction<string>>
 }
 
-export type ToDoItemProps = {
-    id: string,
+export type IdItem = {
+    id: string
+}
+
+export interface ToDoItemProps extends IdItem {
     title: string,
     deadline: string,
     done: boolean,
     description: string,
     hasNotification: boolean
-};
+}
 
-export type Employee = {
+export interface Employee extends IdItem {
     name: string,
-    id: string,
     todos: ToDoItemProps[]
 };
 

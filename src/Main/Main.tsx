@@ -9,7 +9,8 @@ import { AddEmployeeHeaderRight } from './AddEmployeeHeaderRight';
 import { AddEmployeeModal } from './AddEmployeeModal';
 import { EditTodoModal } from './EditTodoModal';
 import { StackNavProps, RootStackParamList } from './RootStackParamList';
-import { GoBackButton } from '../Components/GoBackButton';
+import { HeaderGoBackButton } from '../Components/HeaderGoBackButton';
+import { HeaderSaveButton } from '../Components/HeaderSaveButton';
 
 interface MainProps {
 
@@ -46,7 +47,7 @@ export function Main({ }: MainProps) {
                             title: "Lägg till ny",
                             headerTitleAlign: 'center',
                             headerStyle: { backgroundColor: '#fff', elevation: 0, shadowColor: "transparent" },
-                            headerLeft: () => <GoBackButton {...props} />,
+                            headerLeft: () => <HeaderGoBackButton {...props} />,
                             headerRight: () => <AddEmployeeHeaderRight {...props} />
                         })}
                         component={AddEmployeeModal} />
@@ -55,7 +56,10 @@ export function Main({ }: MainProps) {
                             title: "Ändra",
                             headerTitleAlign: 'center',
                             headerStyle: { backgroundColor: '#fff', elevation: 0, shadowColor: "transparent" },
-                            headerLeft: () => <GoBackButton {...props} />
+                            headerLeft: () => <HeaderGoBackButton {...props} />,
+                            headerRight: () => <HeaderSaveButton onSave={() => {
+                                console.log("SPARA SKITEN", props.route.params.savedData);
+                            }} {...props} />
                         })} />
                 </Stack.Group>
             </Stack.Navigator>

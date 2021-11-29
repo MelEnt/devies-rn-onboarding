@@ -1,5 +1,5 @@
 
-export const SWE_MONTHS = [
+export const SE_MONTHS = [
     "jan",
     "feb",
     "mar",

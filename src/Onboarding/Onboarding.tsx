@@ -28,10 +28,12 @@ export function Onboarding({ route, navigation }: DrawerStackNavProps<"Onboardin
     const todos = getTodosByUserId(userId);
 
     useEffect(() => {
-        setSelectedEmployeeId(userId);
-        navigation.setOptions({
-            title: `Onboarding - ${name}`
-        })
+        if (userId) {
+            setSelectedEmployeeId(userId);
+            navigation.setOptions({
+                title: `Onboarding - ${name}`
+            })
+        }
     }, [userId]);
 
 

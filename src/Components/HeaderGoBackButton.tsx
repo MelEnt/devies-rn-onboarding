@@ -6,7 +6,7 @@ interface GoBackButtonProps {
 
 }
 
-export function GoBackButton({ navigation }: StackNavProps<any>) {
+export function HeaderGoBackButton({ navigation }: StackNavProps<any>) {
     return (
         <Pressable style={{ marginLeft: 15 }} onPress={() => navigation.goBack()}>
             <Text style={{ color: "red" }}>

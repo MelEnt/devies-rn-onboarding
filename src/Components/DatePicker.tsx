@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Keyboard, Platform, View, StyleSheet } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Button, Modal, Portal, Text } from 'react-native-paper';
@@ -6,33 +6,39 @@ import DeadlineDisplay from './DeadlineDisplay';
 
 
 interface DatePickerProps {
-    value: string,
+    value: Date,
     onChange: (date: Date) => void,
     label: string,
-    hasNotification: boolean
+    hasNotification: boolean,
+    onChangeNotification: (hasNotification: boolean) => void
 }
 
 
 
-export function DatePicker({ label = "label", value, onChange, hasNotification }: DatePickerProps) {
+export function DatePicker({ label = "label", value, onChange, hasNotification, onChangeNotification }: DatePickerProps) {
     const [showDate, setShowDate] = useState<boolean>(false);
     const [showTime, setShowTime] = useState<boolean>(false);
-    const [tempDate, setTempDate] = useState<Date>(new Date(value));
-    const [confirmedDate, setConfirmedDate] = useState<Date>(new Date(value));
+    const [tempDate, setTempDate] = useState<Date>(value);
+    const [confirmedDate, setConfirmedDate] = useState<Date>(value);
     const isAndroid = Platform.OS === "android";
 
+    function resetSeconds(date: Date) {
+        const outputDate = new Date(date);
+        outputDate.setSeconds(0);
 
-    const [newDate, setNewDate] = useState<Date>(new Date(value));
-
+        return outputDate;
+    }
 
     function handleSetDate(e: any, date?: Date) {
-        // console.log("onchange", date, tempDate, showDate);
         if (isAndroid) {
             setShowDate(false);
         }
 
         if (date) {
-            setTempDate(date);
+            const outputDate = resetSeconds(date);
+            setTempDate(outputDate);
+            isAndroid && onChange(outputDate);
+
         };
 
     }
@@ -40,10 +46,9 @@ export function DatePicker({ label = "label", value, onChange, hasNotification }
     function handleSetTime(e: any, date?: Date) {
         setShowTime(false);
         if (date) {
-            const outputDate = new Date(date);
-            outputDate.setSeconds(0);
-            setTempDate(date);
-            console.log("OuTPUTDATE", outputDate, date);
+            const outputDate = resetSeconds(date);
+            setTempDate(outputDate);
+            onChange(outputDate);
         }
     }
 
@@ -67,13 +72,8 @@ export function DatePicker({ label = "label", value, onChange, hasNotification }
     function handleConfirmDate() {
         setShowDate(false);
         setConfirmedDate(tempDate);
+        onChange(tempDate);
     }
-
-    function handleSetNotification() {
-
-    }
-
-    console.log(showDate, showTime, tempDate, new Date(value));
 
     return (
         <View>
@@ -83,7 +83,7 @@ export function DatePicker({ label = "label", value, onChange, hasNotification }
                     onPressDate={handleShowDatePicker}
                     onPressTime={isAndroid ? handleShowTimePicker : handleShowDatePicker}
                     hasNotification={hasNotification}
-                    onSetNotification={handleSetNotification} />
+                    onSetNotification={onChangeNotification} />
             </View>
             {/* {isAndroid ? } */}
             {isAndroid &&
